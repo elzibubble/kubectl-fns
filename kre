@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+op="$1"; shift
+case "$op" in
+    logs)
+        pat="$1"; shift
+        k "$op" $(kgg po "$pat") "$@"
+        ;;
+    *)
+        if [[ "${#@}" == '1' || "$2" == '--' ]]; then
+            kind="po"
+        else
+            kind="$1"; shift
+        fi
+        pat="$1"; shift
+        if [[ "$1" == '--' ]]; then
+            shift
+        fi
+        k "$op" "$kind" $(kgg "$kind" "$pat") "$@"
+        ;;
+esac

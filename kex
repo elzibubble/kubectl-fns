@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+pat="$1"; shift
+k exec -ti $(kgg po "$pat") -- "${@:-/bin/sh}"

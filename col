@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+SKIP=''
+if [[ "$1" == "skip" ]]; then
+    SKIP="NR>1"
+    shift
+fi
+COL=1
+if (( ${#@} > 0 )); then
+    COL=shift
+fi
+awk "$SKIP { print \$$COL }"

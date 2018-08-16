@@ -1,0 +1,28 @@
+kubectl-fns
+===========
+
+kubectl convenience functions. Add `. <path>/{bash,zsh}rc` to your shell rc and
+export KUBE_NS='your-kubectl-namespace'.
+
+Dependencies: kubectl, percol
+
+`kswitch` will ask kubectl what namespaces are available and let you set one as
+KUBE_NS.
+
+`k` is the kubectl replacement. It sets `-n $KUBE_NS` and adds a few command
+aliases.
+
+`kgg` (k get grep) takes a kind and regex. It `get`s the kind, greps by the
+regex and returns the first column, usually the full name of the thing matching
+the regex.
+
+`kgp` is like `kgg` but instead of taking a regex, it asks you to pick via
+percol.
+
+`kre` is like `k`, but uses `kgg`. Useful to abbreviate EG pod names: `kre desc
+po comm`.
+
+`kex` will try to find a pod matching the given regex and open a shell there,
+or you can specify a command. `--` is already included, don't add it again.
+
+`ksql` is basically `kex postgres psql`.
