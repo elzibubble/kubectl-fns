@@ -6,11 +6,14 @@ export KUBE_NS='your-kubectl-namespace'.
 
 Dependencies: kubectl, percol
 
-`kswitch` will ask kubectl what namespaces are available and let you set one as
-KUBE_NS.
+`kswitch` will ask kubectl what namespaces are available and lets you set one
+as KUBE_NS.
 
 `k` is the kubectl replacement. It sets `-n $KUBE_NS` and adds a few command
 aliases.
+
+`col N` uses awk to return column N, default 1. `col skip N` drops the first
+line.
 
 `kgg` (k get grep) takes a kind and regex. It `get`s the kind, greps by the
 regex and returns the first column, usually the full name of the thing matching
