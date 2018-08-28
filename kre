@@ -16,7 +16,7 @@ case "$op" in
             kind="$1"; shift
         fi
         pat="$1"; shift
-        if [[ "$1" == '--' ]]; then
+        if (( ${#*} > 0 )) && [[ "$1" == '--' ]]; then
             shift
         fi
         k "$op" "$kind" $(kgg "$kind" "$pat") "$@"
