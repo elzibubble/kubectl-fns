@@ -7,7 +7,8 @@ KGG_ARGS=""
 while (( ${#*} > 0 )); do
     case $1 in
         *)
-            KGG_ARGS="$KGG_ARGS\"$1\" "
+            KGG_ARGS="$KGG_ARGS$1 "
+            shift
             ;;
         --)
             break
@@ -15,5 +16,4 @@ while (( ${#*} > 0 )); do
     esac
 done
 
-pat="$1"; shift
 k exec -ti $(kggc $KGG_ARGS) "${@:-/bin/sh}"
