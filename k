@@ -3,24 +3,28 @@
 set -eu
 set -o pipefail
 
-op="$1"; shift
-kind="$1"; shift
 args="";
 
-case "$op" in
-    del | rm) op='delete';;
-    g) op='get';;
-    d | desc) op='describe';;
-    scale0) op='scale'; args="--replicas=0";;
-    scale1) op='scale'; args="--replicas=1";;
-    scale3) op='scale'; args="--replicas=3";;
-esac
+if (( ${#*} > 0 )); then
+    op="$1"; shift
+    case "$op" in
+        del | rm) op='delete';;
+        g) op='get';;
+        d | desc) op='describe';;
+        scale0) op='scale'; args="--replicas=0";;
+        scale1) op='scale'; args="--replicas=1";;
+        scale3) op='scale'; args="--replicas=3";;
+    esac
+fi
 
-case "$kind" in
-    dep) kind='deploy';;
-esac
+if (( ${#*} > 0 )); then
+    kind="$1"; shift
+    case "$kind" in
+        dep) kind='deploy';;
+    esac
+fi
 
-set -- "$op" "$kind" "$@"
+set -- ${op:+"$op"} ${kind:+"$kind"} "$@"
 if [[ -z "$KUBE_NS" ]]; then
     kubectl $args "$@"
 else
