@@ -3,11 +3,61 @@
 set -eu
 set -o pipefail
 
-if (( ${#@} > 1 )); then
-    kind="$1"; shift
-    pat="$1"; shift
-else
-    kind="po"
-    pat="$1"; shift
+help() {
+    echo <<EOT
+Gets the full name of pods filtered by a pattern or interactively picked.
+
+$0 [-h|--help]
+    This help
+$0 [-g|--grep] pattern ...
+    Filter the returned pods using 'grep -E'
+$0 [-p|--percol] ...
+    Interactively filter the resources with Percol.
+$0 [-k|--kind] kind ...
+    Search for something other than pods.
+EOT
+}
+
+PAT=""
+PERCOL=""
+KIND="po"
+while (( ${#*} > 0 )); do
+    case $1 in
+        -h|--help)
+            help
+            exit
+            ;;
+        -g|--grep)
+            shift
+            PAT="$1"
+            shift
+            ;;
+        -p|--percol)
+            shift
+            PERCOL=1
+            ;;
+        -k|--kind)
+            shift
+            KIND="$1"
+            shift
+            ;;
+        *)
+            if [[ -z "$PAT" ]]; then
+                PAT="$1"
+                shift
+            else
+                echo "Unrecognised argument: $1"
+                exit
+            fi
+            ;;
+    esac
+done
+
+CMD="k get $KIND | col skip"
+if [[ -n "$PAT" ]]; then
+    CMD="$CMD | grep -E '$PAT'"
 fi
-k get "$kind" "$@" | col skip | grep "$pat"
+if [[ -n "$PERCOL" ]]; then
+    CMD="$CMD | percol"
+fi
+eval $CMD

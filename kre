@@ -7,7 +7,7 @@ op="$1"; shift
 case "$op" in
     logs)
         pat="$1"; shift
-        k "$op" $(kgg po "$pat") "$@"
+        k "$op" $(kgg "$pat") "$@"
         ;;
     *)
         if [[ "${#@}" == '1' || "$2" == '--' ]]; then
@@ -19,6 +19,6 @@ case "$op" in
         if (( ${#*} > 0 )) && [[ "$1" == '--' ]]; then
             shift
         fi
-        k "$op" "$kind" $(kgg "$kind" "$pat") "$@"
+        k "$op" "$kind" $(kgg -k "$kind" "$pat") "$@"
         ;;
 esac

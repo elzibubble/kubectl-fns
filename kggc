@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+help() {
+    echo <<EOT
+Returns a pod and container flag EG "mypod-e71fa1 -c broker".
+
+$0 [-h|--help]
+    This help
+$0 [-g|--grep] pattern
+    Filter the pods using 'grep -E'
+$0 [-cg|--container-grep] pattern
+    Filter the containers using 'grep -E'
+$0 [-p|--percol]
+    Interactively filter the pods with Percol.
+$0 [-cp|--container-percol]
+    Interactively filter the containers with Percol.
+$0 -pp
+    Like '-p -cp'.
+EOT
+}
+
+PAT=""
+CONT_PAT=""
+POD_PERCOL=""
+CONT_PERCOL=""
+while (( ${#*} > 0 )); do
+    case $1 in
+        -h|--help)
+            help
+            exit
+            ;;
+        -g|--grep)
+            shift
+            PAT="$1"
+            shift
+            ;;
+        -cg|--container-grep)
+            shift
+            CONT_PAT="$1"
+            shift
+            ;;
+        -p|--percol)
+            shift
+            POD_PERCOL=1
+            ;;
+        -pp)
+            shift
+            POD_PERCOL=1
+            CONT_PERCOL=1
+            ;;
+        -cp|--container-percol)
+            shift
+            CONT_PERCOL=1
+            ;;
+        *)
+            if [[ -z "$PAT" ]]; then
+                PAT="$1"
+                shift
+            elif [[ -z "$CONT_PAT" ]]; then
+                CONT_PAT="$1"
+                shift
+            else
+                echo "Unrecognised argument: $1"
+                exit
+            fi
+            ;;
+    esac
+done
+
+for POD in $(kgg ${PAT:+-g "$PAT"} ${POD_PERCOL:+-p}); do
+    CMD="k get pod '$POD' -o json | jq -r '.spec.containers[] | .name'"
+    if [[ -n "$CONT_PAT" ]]; then
+        CMD="$CMD | grep -E '$CONT_PAT'"
+    fi
+    if [[ -n "$CONT_PERCOL" ]]; then
+        CMD="$CMD | percol"
+    fi
+    for CONT in $(eval $CMD); do
+        echo "$POD -c $CONT"
+    done
+done

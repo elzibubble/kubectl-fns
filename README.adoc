@@ -15,20 +15,21 @@ aliases.
 `col N` uses awk to return column N, default 1. `col skip N` drops the first
 line.
 
-`kgg` (k get grep) takes a kind and regex. It `get`s the kind, greps by the
-regex and returns the first column, usually the full name of the thing matching
-the regex.
+`kgg` (k get grep) finds the full name of a pod based on a pattern. Has --help.
 
-`kgp` is like `kgg` but instead of taking a regex, it asks you to pick via
-percol.
+`kggc` extends `kgg` to match containers. Has --help.
 
 `kre` is like `k`, but uses `kgg`. Useful to abbreviate EG pod names: `kre desc
 po comm`.
 
-`kex` will try to find a pod matching the given regex and open a shell there,
-or you can specify a command. `--` is already included, don't add it again.
+`kex` executes a command (sh by default) in a pod. Arguments until the first
+'--' are passed to `kgg`, the remainder are the command.
+
+`kexc` is exactly like `kex` except that it uses `kggc`.
 
 `ksql` is basically `kex postgres psql`.
+
+`kexp` allows you to interactively choose which container to enter.
 
 `ksetsecret` uses `kube-secret-editor.py` to set values from `~/.ksecretvals`
 into the given secret (via `kgg`). EG if your secret (`root-pg-password`) looks

@@ -16,4 +16,4 @@ while (( ${#*} > 0 )); do
 done
 
 pat="$1"; shift
-k exec -ti $(kgg $KGG_ARGS) "${@:-/bin/sh}"
+k exec -ti $(kggc $KGG_ARGS) "${@:-/bin/sh}"
