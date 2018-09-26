@@ -3,17 +3,23 @@
 set -eu
 set -o pipefail
 
+KGG=kgg
 KGG_ARGS=""
 while (( ${#*} > 0 )); do
     case $1 in
+        -c)
+            KGG=kggc
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
         *)
             KGG_ARGS="$KGG_ARGS$1 "
             shift
             ;;
-        --)
-            break
-            ;;
     esac
 done
 
-k exec -ti $(kgg $KGG_ARGS) "${@:-/bin/sh}"
+k exec -ti $($KGG $KGG_ARGS) -- env COLUMNS=$COLUMNS LINES=$LINES TERM=$TERM ${@:-/bin/sh -c '(test -f /bin/bash && /bin/bash) || /bin/sh'}
