@@ -28,6 +28,5 @@ set -- ${op:+"$op"} ${kind:+"$kind"} "$@"
 if [[ -z "$KUBE_NS" ]]; then
     kubectl $args "$@"
 else
-    echo kubectl -n "$KUBE_NS" $args "$@"
     kubectl -n "$KUBE_NS" $args "$@"
 fi
