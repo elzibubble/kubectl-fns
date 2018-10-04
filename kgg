@@ -7,18 +7,23 @@ help() {
     cat <<EOT
 Gets the full name of pods filtered by a pattern or interactively picked.
 
-$0 [-h|--help]
+kgg [-h|--help]
     This help
-$0 [-g|--grep] pattern ...
-    Filter the returned pods using 'grep -E'
-$0 [-p|--percol] ...
+kgg [-g|--grep] pattern ...
+    Only include results matching <pattern>.
+    A single pattern can be given as a positional parameter.
+    If multiple patterns are given, all must match.
+kgg [-i|--ignore] pattern ...
+    Exclude results matching <pattern>.
+kgg [-p|--percol] ...
     Interactively filter the resources with Percol.
-$0 [-k|--kind] kind ...
+kgg [-k|--kind] kind ...
     Search for something other than pods.
 EOT
 }
 
-PAT=""
+INCLUDE=""
+EXCLUDE=""
 PERCOL=""
 KIND="po"
 while (( ${#*} > 0 )); do
@@ -29,7 +34,12 @@ while (( ${#*} > 0 )); do
             ;;
         -g|--grep)
             shift
-            PAT="$1"
+            INCLUDE="$INCLUDE|$1"
+            shift
+            ;;
+        -i|--ignore)
+            shift
+            EXCLUDE="$EXCLUDE|$1"
             shift
             ;;
         -p|--percol)
@@ -42,8 +52,8 @@ while (( ${#*} > 0 )); do
             shift
             ;;
         *)
-            if [[ -z "$PAT" ]]; then
-                PAT="$1"
+            if [[ -z "$INCLUDE" ]]; then
+                INCLUDE="$INCLUDE|$1"
                 shift
             else
                 echo "Unrecognised argument: $1"
@@ -52,11 +62,11 @@ while (( ${#*} > 0 )); do
             ;;
     esac
 done
+INCLUDE="${INCLUDE#|}"
+EXCLUDE="${EXCLUDE#|}"
 
-CMD="k get $KIND | col skip"
-if [[ -n "$PAT" ]]; then
-    CMD="$CMD | grep -E '$PAT'"
-fi
+AWKCMD="NR>1 ${INCLUDE:+&& /$INCLUDE/} ${EXCLUDE:+&& !/$EXCLUDE/} { print \\\$1 }"
+CMD="k get $KIND | awk \"$AWKCMD\"" # | tr '\n' ' '"
 if [[ -n "$PERCOL" ]]; then
     CMD="$CMD | percol"
 fi
