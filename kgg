@@ -4,7 +4,7 @@ set -eu
 set -o pipefail
 
 help() {
-    echo <<EOT
+    cat <<EOT
 Gets the full name of pods filtered by a pattern or interactively picked.
 
 $0 [-h|--help]
