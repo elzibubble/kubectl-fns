@@ -22,9 +22,7 @@ kgg [-k|--kind] kind ...
 EOT
 }
 
-INCLUDE=""
-EXCLUDE=""
-PERCOL=""
+ARGS=( "$@" )
 KIND="po"
 while (( ${#*} > 0 )); do
     case $1 in
@@ -32,42 +30,15 @@ while (( ${#*} > 0 )); do
             help
             exit
             ;;
-        -g|--grep)
-            shift
-            INCLUDE="$INCLUDE|$1"
-            shift
-            ;;
-        -i|--ignore)
-            shift
-            EXCLUDE="$EXCLUDE|$1"
-            shift
-            ;;
-        -p|--percol)
-            shift
-            PERCOL=1
-            ;;
         -k|--kind)
             shift
             KIND="$1"
             shift
             ;;
         *)
-            if [[ -z "$INCLUDE" ]]; then
-                INCLUDE="$INCLUDE|$1"
-                shift
-            else
-                echo "Unrecognised argument: $1"
-                exit
-            fi
+            shift
             ;;
     esac
 done
-INCLUDE="${INCLUDE#|}"
-EXCLUDE="${EXCLUDE#|}"
 
-AWKCMD="NR>1 ${INCLUDE:+&& /$INCLUDE/} ${EXCLUDE:+&& !/$EXCLUDE/} { print \\\$1 }"
-CMD="k get $KIND | awk \"$AWKCMD\"" # | tr '\n' ' '"
-if [[ -n "$PERCOL" ]]; then
-    CMD="$CMD | percol"
-fi
-eval $CMD
+k get $KIND | pick --skip-header-line --positional "${ARGS[@]}"

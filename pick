@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+help() {
+    cat <<EOT
+Select items from a list, interactively or not.
+
+pick [-h|--help]
+    This help
+pick [-g|--grep] pattern ...
+    Only include results matching <pattern>.
+    If --positional is passed then a single pattern can be given as a
+    positional parameter. This is a back-compatibility hack.
+    If multiple patterns are given, all must match.
+pick -i|--ignore pattern ...
+    Exclude results matching <pattern>.
+pick [-p|--percol] ...
+    Interactively filter the resources with Percol.
+pick [--skip-header-line] ...
+    Ignore the first line of input.
+EOT
+}
+
+POSITIONAL=""
+INCLUDE=""
+EXCLUDE=""
+PERCOL=""
+SKIP_HEADER_LINE=""
+COLUMN_NUMBER=1
+while (( ${#*} > 0 )); do
+    case $1 in
+        -h|--help)
+            help
+            exit
+            ;;
+        --positional)
+            shift
+            POSITIONAL=1
+            ;;
+        -g|--grep)
+            shift
+            INCLUDE="$INCLUDE|$1"
+            shift
+            ;;
+        -i|--ignore)
+            shift
+            EXCLUDE="$EXCLUDE|$1"
+            shift
+            ;;
+        -p|--percol)
+            shift
+            PERCOL=1
+            ;;
+        -c|--column-number)
+            shift
+            COLUMN_NUMBER=$1
+            shift
+            ;;
+        --skip-header-line)
+            shift
+            SKIP_HEADER_LINE=1
+            ;;
+        *)
+            if [[ -n "$POSITIONAL" ]] && [[ -z "$INCLUDE" ]]; then
+                INCLUDE="$INCLUDE|$1"
+                shift
+            else
+                # Just ignore arguments we don't recognise
+                shift
+                continue
+            fi
+            ;;
+    esac
+done
+INCLUDE="${INCLUDE#|}"
+EXCLUDE="${EXCLUDE#|}"
+
+CMD="awk '1 ${SKIP_HEADER_LINE:+&& NR>1 }${INCLUDE:+&& /$INCLUDE/ }${EXCLUDE:+&& !/$EXCLUDE/ }{ print \$$COLUMN_NUMBER }'"
+if [[ -n "$PERCOL" ]]; then
+    CMD="$CMD | percol"
+fi
+eval $CMD
