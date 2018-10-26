@@ -22,7 +22,7 @@ kgg [-k|--kind] kind ...
 EOT
 }
 
-ARGS=( "$@" )
+PASS=()
 KIND="po"
 while (( ${#*} > 0 )); do
     case $1 in
@@ -36,9 +36,10 @@ while (( ${#*} > 0 )); do
             shift
             ;;
         *)
+            PASS+=("$1")
             shift
             ;;
     esac
 done
 
-k get $KIND | pick --skip-header-line --positional "${ARGS[@]}"
+k get $KIND | pick --skip-header-line --positional "${PASS[@]}"
