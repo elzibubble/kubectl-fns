@@ -7,23 +7,20 @@ help() {
     cat <<EOT
 Select items from a list, interactively or not.
 
-pick [-h|--help]
+pick -h|--help
     This help
 pick [-g|--grep] pattern ...
     Only include results matching <pattern>.
-    If --positional is passed then a single pattern can be given as a
-    positional parameter. This is a back-compatibility hack.
     If multiple patterns are given, all must match.
 pick -i|--ignore pattern ...
     Exclude results matching <pattern>.
-pick [-p|--percol] ...
+pick -p|--percol ...
     Interactively filter the resources with Percol.
-pick [--skip-header-line] ...
+pick --skip-header-line ...
     Ignore the first line of input.
 EOT
 }
 
-POSITIONAL=""
 INCLUDE=""
 EXCLUDE=""
 PERCOL=""
@@ -34,10 +31,6 @@ while (( ${#*} > 0 )); do
         -h|--help)
             help
             exit
-            ;;
-        --positional)
-            shift
-            POSITIONAL=1
             ;;
         -g|--grep)
             shift
@@ -63,14 +56,8 @@ while (( ${#*} > 0 )); do
             SKIP_HEADER_LINE=1
             ;;
         *)
-            if [[ -n "$POSITIONAL" ]] && [[ -z "$INCLUDE" ]]; then
-                INCLUDE="$INCLUDE|$1"
-                shift
-            else
-                # Just ignore arguments we don't recognise
-                shift
-                continue
-            fi
+            INCLUDE="$INCLUDE|$1"
+            shift
             ;;
     esac
 done

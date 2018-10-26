@@ -7,17 +7,16 @@ help() {
     cat <<EOT
 Gets the full name of pods filtered by a pattern or interactively picked.
 
-kgg [-h|--help]
+kgg -h|--help
     This help
 kgg [-g|--grep] pattern ...
     Only include results matching <pattern>.
-    A single pattern can be given as a positional parameter.
     If multiple patterns are given, all must match.
-kgg [-i|--ignore] pattern ...
+kgg -i|--ignore pattern ...
     Exclude results matching <pattern>.
-kgg [-p|--percol] ...
+kgg -p|--percol ...
     Interactively filter the resources with Percol.
-kgg [-k|--kind] kind ...
+kgg -k|--kind kind ...
     Search for something other than pods.
 EOT
 }
@@ -42,4 +41,4 @@ while (( ${#*} > 0 )); do
     esac
 done
 
-k get $KIND | pick --skip-header-line --positional "${PASS[@]}"
+k get $KIND | pick --skip-header-line "${PASS[@]}"
