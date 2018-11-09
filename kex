@@ -22,4 +22,7 @@ while (( ${#*} > 0 )); do
     esac
 done
 
+export COLUMNS=${COLUMNS:-80}
+export LINES=${LINES:-24}
+export TERM=${TERM:-xterm}
 k exec -ti $($KGG $KGG_ARGS) -- env COLUMNS=$COLUMNS LINES=$LINES TERM=$TERM ${@:-/bin/sh -c '(test -f /bin/bash && /bin/bash) || /bin/sh'}
