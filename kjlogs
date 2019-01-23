@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+kre logs "$1" | convert-json --color --prefix '%(timestamp)s %(level)s %(logger)s' --levelkey level
