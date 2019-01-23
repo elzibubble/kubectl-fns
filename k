@@ -9,6 +9,7 @@ if (( ${#*} > 0 )); then
     op="$1"; shift
     case "$op" in
         del | rm) op='delete';;
+        kill) op='delete'; args="--force --grace-period=0";;
         g) op='get';;
         d | desc) op='describe';;
         scale0) op='scale'; args="--replicas=0";;
