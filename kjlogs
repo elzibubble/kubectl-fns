@@ -24,4 +24,4 @@ done
 
 service="${args[0]}"
 
-echo kre logs "$service" ${FOLLOW:+-f} \| convert-json --color --prefix '%(timestamp)s %(level)s %(logger)s' --levelkey level "${args[@]:1}"
+kre logs "$service" ${FOLLOW:+-f} | convert-json --color --prefix '%(timestamp)s %(level)s %(logger)s' --levelkey level "${args[@]:1}"
