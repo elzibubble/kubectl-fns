@@ -3,4 +3,25 @@
 set -eu
 set -o pipefail
 
-kre logs "$1" | convert-json --color --prefix '%(timestamp)s %(level)s %(logger)s' --levelkey level
+FOLLOW=""
+args=()
+while (( ${#*} > 0 )); do
+  case $1 in
+    -h|--help)
+      help
+      exit
+      ;;
+    -f|--follow)
+      FOLLOW=1
+      shift
+      ;;
+    *)
+      args+=("$1")
+      shift
+      ;;
+  esac
+done
+
+service="${args[0]}"
+
+echo kre logs "$service" ${FOLLOW:+-f} \| convert-json --color --prefix '%(timestamp)s %(level)s %(logger)s' --levelkey level "${args[@]:1}"
