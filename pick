@@ -64,7 +64,7 @@ done
 INCLUDE="${INCLUDE#|}"
 EXCLUDE="${EXCLUDE#|}"
 
-CMD="awk '1 ${SKIP_HEADER_LINE:+&& NR>1 }${INCLUDE:+&& /$INCLUDE/ }${EXCLUDE:+&& !/$EXCLUDE/ }{ print \$$COLUMN_NUMBER }'"
+CMD="awk '1 ${SKIP_HEADER_LINE:+&& NR>1 }${INCLUDE:+&& /^($INCLUDE)/ }${EXCLUDE:+&& !/^($EXCLUDE)/ }{ print \$$COLUMN_NUMBER }'"
 if [[ -n "$PERCOL" ]]; then
     CMD="$CMD | percol"
 fi
