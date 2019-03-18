@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+k g dep -o name | xargs -n 1 -P 0 k rollout status
