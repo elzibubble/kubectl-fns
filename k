@@ -4,7 +4,6 @@ set -eu
 set -o pipefail
 
 args="";
-
 if (( ${#*} > 0 )); then
     op="$1"; shift
     case "$op" in
@@ -12,6 +11,7 @@ if (( ${#*} > 0 )); then
         kill) op='delete'; args="--force --grace-period=0";;
         g) op='get';;
         d | desc) op='describe';;
+        tail) op='logs'; set -- --tail=10 --follow "$@";;
         scale0) op='scale'; args="--replicas=0";;
         scale1) op='scale'; args="--replicas=1";;
         scale3) op='scale'; args="--replicas=3";;
