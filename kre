@@ -5,7 +5,7 @@ set -o pipefail
 
 op="$1"; shift
 case "$op" in
-    logs | tail)
+    logs | tail | tail0)
         pat="$1"; shift
         k "$op" $(kgg "$pat") "$@"
         ;;

@@ -12,6 +12,7 @@ if (( ${#*} > 0 )); then
         g) op='get';;
         d | desc) op='describe';;
         tail) op='logs'; set -- --tail=10 --follow "$@";;
+        tail0) op='logs'; set -- --tail=0 --follow "$@";;
         scale0) op='scale'; args="--replicas=0";;
         scale1) op='scale'; args="--replicas=1";;
         scale3) op='scale'; args="--replicas=3";;
