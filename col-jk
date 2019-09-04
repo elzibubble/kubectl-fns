@@ -1,0 +1,47 @@
+#!/usr/bin/env joker
+(ns script
+    (:require [joker.tools.cli :as cli]
+              [joker.os :as os]))
+
+(def VERSION "1")
+
+(def opts
+  [[nil "--skip" "Skip first line?"]
+   ["-v" "--version" "Show version information"]
+   ["-h" "--help" "Show this summary"]])
+
+(defn show-options
+  [summary errors]
+  (println "Options")
+  (println summary)
+  (when errors
+    (println "\nErrors:")
+    (run! println errors)))
+
+(defn doit
+  [skip args]
+  (let [{:keys [success out err]}
+        (os/exec "awk" {:stdin :pipe
+                        :args [(str (when skip "NR>1 ")
+                                    "{print $" (or (first args) 2) "}")]})]
+    (if success
+      (print out)
+      (binding [*out* *err*]
+        (print err)))))
+
+(let [{:keys [options arguments summary errors]} (cli/parse-opts *command-line-args* opts)
+      {:keys [help version skip]} options]
+  (cond
+    errors
+    (do
+      (show-options summary errors)
+      (os/exit -1))
+
+    help
+    (show-options summary nil)
+
+    version
+    (println "Version:" VERSION)
+
+    :else
+    (doit skip arguments)))
