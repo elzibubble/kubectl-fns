@@ -4,25 +4,19 @@ set -eu
 set -o pipefail
 
 KGG=kgg
-KGG_ARGS=""
+KGG_ARGS=()
 while (( ${#*} > 0 )); do
-    case $1 in
-        -c)
-            KGG=kggc
-            shift
-            ;;
-        --)
-            shift
-            break
-            ;;
-        *)
-            KGG_ARGS="$KGG_ARGS$1 "
-            shift
-            ;;
-    esac
+  case $1 in
+    -c) KGG=kggc; shift ;;
+    --) shift; break ;;
+    *) KGG_ARGS+=($1); shift ;;
+  esac
 done
+if [[ -z "$*" ]]; then
+  set -- /bin/sh -c '(test -f /bin/bash && /bin/bash) || /bin/sh'
+fi
 
 export COLUMNS=${COLUMNS:-80}
 export LINES=${LINES:-24}
 export TERM=${TERM:-xterm}
-k exec -ti $($KGG $KGG_ARGS) -- env COLUMNS=$COLUMNS LINES=$LINES TERM=$TERM ${@:-/bin/sh -c '(test -f /bin/bash && /bin/bash) || /bin/sh'}
+k exec -ti $($KGG "${KGG_ARGS[@]}") -- env COLUMNS=$COLUMNS LINES=$LINES TERM=$TERM "$@"

@@ -27,7 +27,7 @@ if (( ${#*} > 0 )); then
 fi
 
 set -- ${op:+"$op"} ${kind:+"$kind"} "$@"
-if [[ -z "$KUBE_NS" ]]; then
+if [[ -z "${KUBE_NS:-}" ]]; then
     kubectl $args "$@"
 else
     kubectl -n "$KUBE_NS" $args "$@"

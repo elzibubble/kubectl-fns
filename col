@@ -10,6 +10,7 @@ if [[ "${1:-}" == "skip" ]]; then
 fi
 COL=1
 if (( ${#@} > 0 )); then
-    COL=shift
+    COL=$1
+    shift
 fi
 awk "$SKIP { print \$$COL }"
