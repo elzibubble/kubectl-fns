@@ -3,4 +3,4 @@
 set -eu
 set -o pipefail
 
-kex '.*postgres' -- su postgres -c psql
+kex '.*postgres' -- su postgres -c "psql $*"
