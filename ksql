@@ -3,4 +3,5 @@
 set -eu
 set -o pipefail
 
-kex '.*postgres' -- su postgres -c "psql $*"
+# kex '.*postgres' -- su postgres -c psql
+kubectl exec -ti read-model-postgres-database-0 -n read-model-db -- su postgres -c "psql ${*:-user_api}"
