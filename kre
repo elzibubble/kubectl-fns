@@ -3,6 +3,9 @@
 set -eu
 set -o pipefail
 
+echo "Currently broken, no ns support"
+exit
+
 op="$1"; shift
 case "$op" in
     logs | tail | tail0)

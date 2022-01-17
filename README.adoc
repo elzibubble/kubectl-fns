@@ -6,16 +6,11 @@ export KUBE_NS='your-kubectl-namespace'.
 
 Dependencies: kubectl, percol
 
-`kswitch` will ask kubectl what namespaces are available and lets you set one
-as KUBE_NS.
-
-`k` is the kubectl replacement. It sets `-n $KUBE_NS` and adds a few command
-aliases.
-
 `col N` uses awk to return column N, default 1. `col skip N` drops the first
 line.
 
-`kgg` (k get grep) finds the full name of a pod based on a pattern. Has --help.
+`kgg` (k get grep) finds the namespace and name of a pod based on a pattern.
+Has --help.
 
 `kggc` extends `kgg` to match containers. Has --help.
 

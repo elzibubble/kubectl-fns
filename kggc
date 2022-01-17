@@ -70,15 +70,14 @@ while (( ${#*} > 0 )); do
     esac
 done
 
-for POD in $(kgg ${PAT:+-g "$PAT"} ${POD_PERCOL:+-p}); do
-    CMD="k get pod '$POD' -o json | jq -r '.spec.containers[] | .name'"
-    if [[ -n "$CONT_PAT" ]]; then
-        CMD="$CMD | grep -E '$CONT_PAT'"
-    fi
-    if [[ -n "$CONT_PERCOL" ]]; then
-        CMD="$CMD | percol"
-    fi
-    for CONT in $(eval $CMD); do
-        echo "$POD -c $CONT"
-    done
+POD=$(kgg ${PAT:+-g "$PAT"} ${POD_PERCOL:+-p})
+CMD="kubectl get pod $POD -o json | jq -r '.spec.containers[] | .name'"
+if [[ -n "$CONT_PAT" ]]; then
+    CMD="$CMD | grep -E '$CONT_PAT'"
+fi
+if [[ -n "$CONT_PERCOL" ]]; then
+    CMD="$CMD | percol"
+fi
+for CONT in $(eval $CMD); do
+    echo "$POD -c $CONT"
 done

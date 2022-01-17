@@ -5,40 +5,68 @@ set -o pipefail
 
 help() {
     cat <<EOT
-Gets the full name of pods filtered by a pattern or interactively picked.
+Gets the full name of pods filtered by a pattern or interactively picked. If
+multiple results are found then interactive use is forced.
 
-kgg -h|--help
+OPTIONS
+  -h|--help
     This help
-kgg [-g|--grep] pattern ...
+  [-g|--grep] pattern ...
     Only include results matching <pattern>.
     If multiple patterns are given, all must match.
-kgg -i|--ignore pattern ...
+  -i|--ignore pattern ...
     Exclude results matching <pattern>.
-kgg -p|--percol ...
+  -n|--namespace namespace
+    Limit to the given namespace, otherwise checks all.
+  -p|--percol ...
     Interactively filter the resources with Percol.
-kgg -k|--kind kind ...
+  -k|--kind kind ...
     Search for something other than pods.
 EOT
 }
 
 PASS=()
-KIND="po"
+KIND="pods"
+NS=""
 while (( ${#*} > 0 )); do
     case $1 in
         -h|--help)
             help
-            exit
-            ;;
+            exit;;
         -k|--kind)
-            shift
-            KIND="$1"
-            shift
-            ;;
+            shift; KIND="$1"
+            shift;;
+        -n|--namespace)
+            shift; NS="$1"
+            shift;;
         *)
             PASS+=("$1")
-            shift
-            ;;
+            shift;;
     esac
 done
 
-k get $KIND | pick --skip-header-line "${PASS[@]}"
+if [ -z "$NS" ]; then
+  NS_FLAG="-A"
+else
+  NS_FLAG="-n $NS"
+fi
+
+PICKED=$(kubectl get $NS_FLAG $KIND | pick --skip-header-line "${PASS[@]}")
+while true; do
+  # echo "PICKED $PICKED"
+  NUM_PICKED=$(wc -l <<<"$PICKED")
+  case "$NUM_PICKED" in
+    0)
+      echo "0 results" >&2
+      exit;;
+    1)
+      if [ -z "$NS" ]; then
+        awk '{print "-n " $1 " " $2}' <<<"$PICKED"
+      else
+        awk '{print "'"$NS_FLAG"' " $1}' <<<"$PICKED"
+      fi
+      exit;;
+    *)
+      PICKED=$(pick --percol <<<"$PICKED");;
+  esac
+done
